@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
 
 #include "utils.h"
+#include "types.h"
 
 #define SHM_KEY 248
 #define SEM_KEY 369
@@ -17,7 +17,7 @@
 //******************************************************************************
 int shm_id;
 int sem_id;
-int* z;
+Program* z;
 
 //******************************************************************************
 //SHARED MEMORY
