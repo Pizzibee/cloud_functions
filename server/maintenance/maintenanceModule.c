@@ -5,8 +5,9 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 
-#include "utils.h"
-#include "types.h"
+#include "../../utils/check.h"
+#include "../../types/types.h"
+#include "maintenanceModule.h"
 
 #define SHM_KEY 248
 #define SEM_KEY 369
@@ -16,7 +17,6 @@
 //GLOBAL VARIABLES
 //******************************************************************************
 int shm_id;
-int sem_id;
 Program* z;
 
 //******************************************************************************
@@ -38,4 +38,12 @@ void sshmdt() {
 void del_shm() {
   int r = shmctl(shm_id, IPC_RMID, NULL);
   checkNeg(r, "Error shmctl");
+}
+
+void set_id(int id){
+  z->id = id;
+}
+
+int id_prog(){
+  return z->id;
 }

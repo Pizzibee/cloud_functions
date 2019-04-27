@@ -1,10 +1,11 @@
 #ifndef _MAINTENANCEMODULE_H_
 #define _MAINTENANCEMODULE_H_
 
-#include "types.h"
 
-void init_shm(ProgramArray);
+void init_shm();
 void sshmdt();
 void del_shm();
+int id_prog();
+void set_id(int id);
 
 #endif
