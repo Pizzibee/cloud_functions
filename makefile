@@ -9,12 +9,12 @@ MAINTANENANCE_PATH = server/maintenance/
 all:server maint
 
 server: $(SERVER_PATH)server.o $(MAINTANENANCE_PATH)maintenanceModule.o $(UTILS_PATH)check.o
-	cc $(CFLAGS) -o serverTest $(SERVER_PATH)server.o $(MAINTANENANCE_PATH)maintenanceModule.o $(UTILS_PATH)check.o
+	cc $(CFLAGS) -g -o serverTest $(SERVER_PATH)server.o $(MAINTANENANCE_PATH)maintenanceModule.o $(UTILS_PATH)check.o
 
 server.o: $(SERVER_PATH)server.c $(MAINTANENANCE_PATH)maintenanceModule.h  $(TYPE_PATH)types.h
 	cc $(CFLAGS) -c  $(SERVER_PATH)server.c
 
-maint: $(MAINTANENANCE_PATH)maint.o $(MAINTANENANCE_PATH)maintenanceModule.o $(UTILS_PATH)check.o
+maint: $(MAINTANENANCE_PATH)maint.o $(MAINTANENANCE_PATH)maintenanceModule.o $(UTILS_PATH)check.o $(TYPE_PATH)types.h
 	cc $(CFLAGS) -o maint $(MAINTANENANCE_PATH)maint.o $(MAINTANENANCE_PATH)maintenanceModule.o $(UTILS_PATH)check.o
 
 maint.o: $(MAINTANENANCE_PATH)maint.c $(MAINTANENANCE_PATH)maintenanceModule.h  $(TYPE_PATH)types.h

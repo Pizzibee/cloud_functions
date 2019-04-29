@@ -9,7 +9,7 @@
 #include "../../types/types.h"
 #include "maintenanceModule.h"
 
-#define SHM_KEY 248
+#define SHM_KEY 240
 #define SEM_KEY 369
 #define PERM 0666
 
@@ -17,7 +17,7 @@
 //GLOBAL VARIABLES
 //******************************************************************************
 int shm_id;
-Program* z;
+ProgramArray* tab;
 
 //******************************************************************************
 //SHARED MEMORY
@@ -26,12 +26,12 @@ void init_shm() {
   shm_id = shmget(SHM_KEY, sizeof(int), IPC_CREAT | PERM);
   checkNeg(shm_id, "Error shmget");
 
-  z = shmat(shm_id, NULL, 0);
-  checkCond(z == (void*) -1, "Error shmat");
+  tab = shmat(shm_id, NULL, 0);
+  checkCond(tab == (void*) -1, "Error shmat");
 }
 
 void sshmdt() {
-  int r = shmdt(z);
+  int r = shmdt(tab);
   checkNeg(r, "Error shmdt");
 }
 
@@ -40,10 +40,21 @@ void del_shm() {
   checkNeg(r, "Error shmctl");
 }
 
-void set_id(int id){
-  z->id = id;
+void init_array(){
+  (tab->size) = 0;
 }
 
-int id_prog(){
-  return z->id;
+int get_size(){
+  return tab->size;
+}
+
+void add_program(Program p) {
+  int s = tab->size;
+  p.id = s;
+  (tab->tabProg)[s] = p;
+  tab->size = s+1;
+}
+
+Program* get_array(){
+  return tab->tabProg;
 }

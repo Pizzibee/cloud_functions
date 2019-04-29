@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #define FILE_SIZE 255
-#define SIZE_MAX_PROGRAM 1000
+#define SIZE_MAX_PROGRAM 9
 
 typedef struct{
   int id;
@@ -15,8 +15,7 @@ typedef struct{
 
 typedef struct{
   Program tabProg[SIZE_MAX_PROGRAM];
-  int logicalSize;
-  int physicalSize;
+  int size;
 } ProgramArray;
 
 #endif

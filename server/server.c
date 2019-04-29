@@ -6,6 +6,7 @@
 int main(int argc, char const *argv[]) {
   printf("Server hello\n");
   init_shm();
-  printf("%d\n",id_prog());
+  printf("");
+  sshmdt();
   return 0;
 }
