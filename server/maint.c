@@ -1,21 +1,22 @@
-#include "maintenanceModule.h"
-#include "../../types/types.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../utils/sharedMem.h"
+#include "../types/types.h"
+
 
 int main(int argc, char *argv[]) {
   if(argc == 2){
     int arg = atoi(argv[1]);
-    init_shm();
+    initShm();
     if (arg == 1) {
-      init_array();
+      initArray();
       Program p;
       p.executionTime = 4;
-      add_program(p);
-      printf("%d\n",get_size() );
+      printf("%d\n", addProgram(p));
+      printf("%d\n",getSize() );
     }
     else if(arg == 2){
-      del_shm();
+      delShm();
     }
     sshmdt();
   }

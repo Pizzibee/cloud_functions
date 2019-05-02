@@ -2,8 +2,11 @@
 #define _TYPES_H_
 
 #include <stdbool.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
 #define FILE_SIZE 255
-#define SIZE_MAX_PROGRAM 9
+#define MAX_PROGRAM 1000
 
 typedef struct{
   int id;
@@ -14,7 +17,7 @@ typedef struct{
 } Program;
 
 typedef struct{
-  Program tabProg[SIZE_MAX_PROGRAM];
+  Program tabProg[MAX_PROGRAM];
   int size;
 } ProgramArray;
 
