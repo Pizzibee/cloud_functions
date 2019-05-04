@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../utils/sharedMem.h"
 #include "../types/types.h"
 
@@ -10,10 +11,18 @@ int main(int argc, char *argv[]) {
     initShm();
     if (arg == 1) {
       initArray();
-      Program p;
-      p.executionTime = 4;
-      printf("%d\n", addProgram(p));
-      printf("%d\n",getSize() );
+      Program p1;
+      strcpy(p1.sourceFile,"test1.c");
+      p1.compilationError = false;
+      p1.executionCounter = 4;
+      p1.executionTime = 20;
+      Program p2;
+      strcpy(p2.sourceFile,"test2.c");
+      p2.compilationError = true;
+      p2.executionCounter = 4;
+      p2.executionTime = 20;
+      printf("%d\n", addProgram(p1));
+      printf("%d\n", addProgram(p2));
     }
     else if(arg == 2){
       delShm();
