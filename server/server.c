@@ -22,11 +22,20 @@ int initSocketServer(int port)
 
 int main(int argc, char const *argv[]) {
   printf("Server hello\n");
-  int sockfd;
+  int sockfd, newsockfd, i, ret;
 
   initShm();
   sockfd = initSocketServer(SERVER_PORT);
   printf("Le serveur tourne sur le port : %i \n",SERVER_PORT);
+  while (1) {
+    /* client trt */
+    newsockfd = accept(sockfd, NULL,NULL);
+    if (newsockfd > 0 ) {
+      ret = read(newsockfd,&i,sizeof(int));
+      checkNeg(ret,"server read error");
+      printf("J'ai reçu le chiffre %d",i);
+    }
+  }
   sshmdt();
   return 0;
 }
