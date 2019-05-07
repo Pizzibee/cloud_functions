@@ -7,8 +7,8 @@ UTILS_PATH = utils/
 
 all:server maint gstat
 
-server: $(SERVER_PATH)server.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o
-	cc $(CFLAGS) -g -o serverTest $(SERVER_PATH)server.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o
+server: $(SERVER_PATH)server.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o $(UTILS_PATH)utils.o
+	cc $(CFLAGS) -g -o serverTest $(SERVER_PATH)server.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o $(UTILS_PATH)utils.o
 
 maint: $(SERVER_PATH)maint.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o $(TYPE_PATH)types.h
 		cc $(CFLAGS) -o maint $(SERVER_PATH)maint.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o
@@ -28,7 +28,7 @@ maint.o: $(SERVER_PATH)maint.c $(UTILS_PATH)sharedMem.h  $(TYPE_PATH)types.h
 sharedMem.o: $(UTILS_PATH)sharedMem.c $(UTILS_PATH)sharedMem.h  $(TYPE_PATH)types.h
 	cc $(CFLAGS) -c $(UTILS_PATH)sharedMem.c
 
-utils.o: $(UTILS_PATH)utils.h $(UTILS_PATH)utils.c
+utils.o: $(UTILS_PATH)utils.h $(UTILS_PATH)utils.c $(UTILS_PATH)check.h 
 	cc $(CFLAGS) -c $(UTILS_PATH)utils.c
 
 check.o: $(UTILS_PATH)check.h $(UTILS_PATH)check.c
