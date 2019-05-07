@@ -33,7 +33,7 @@ int main(int argc, char const *argv[]) {
     if (newsockfd > 0 ) {
       ret = read(newsockfd,&i,sizeof(int));
       checkNeg(ret,"server read error");
-      printf("J'ai reçu le chiffre %d",i);
+      printf("j'ai reçu %d\n",i );
     }
   }
   sshmdt();
