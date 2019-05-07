@@ -13,8 +13,8 @@
 
 #define BUFFER_SIZE 1024
 
-#define SERVER_PORT 		9500
-#define SERVER_IP		"127.0.0.1"  /* localhost */
+#define SERVER_PORT 9500
+#define SERVER_IP	"127.0.0.1"  /* localhost */
 
 //*****************************************************************************
 // FILE

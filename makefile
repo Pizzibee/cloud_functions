@@ -5,7 +5,7 @@ CLIENT_PATH = client/
 TYPE_PATH = types/
 UTILS_PATH = utils/
 
-all:server maint gstat
+all:server maint gstat client
 
 server: $(SERVER_PATH)server.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o $(UTILS_PATH)utils.o
 	cc $(CFLAGS) -g -o serverTest $(SERVER_PATH)server.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o $(UTILS_PATH)utils.o
@@ -15,6 +15,12 @@ maint: $(SERVER_PATH)maint.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o $(TYP
 
 gstat: $(SERVER_PATH)gstat.o $(UTILS_PATH)sharedMem.o  $(TYPE_PATH)types.h
 		cc $(CFLAGS) -o gstat $(SERVER_PATH)gstat.o $(UTILS_PATH)sharedMem.o $(UTILS_PATH)check.o
+
+client: $(CLIENT_PATH)client.o $(UTILS_PATH)utils.o $(UTILS_PATH)check.o
+	cc $(CFLAGS) -o clientTest $(CLIENT_PATH)client.o $(UTILS_PATH)utils.o $(UTILS_PATH)check.o
+
+client.o: $(CLIENT_PATH)client.c $(UTILS_PATH)utils.h
+	cc $(CFLAGS) -c $(CLIENT_PATH)client.c
 
 gstat.o: $(SERVER_PATH)gstat.c $(UTILS_PATH)sharedMem.h  $(TYPE_PATH)types.h
 	cc $(CFLAGS) -c  $(SERVER_PATH)gstat.c
@@ -28,7 +34,7 @@ maint.o: $(SERVER_PATH)maint.c $(UTILS_PATH)sharedMem.h  $(TYPE_PATH)types.h
 sharedMem.o: $(UTILS_PATH)sharedMem.c $(UTILS_PATH)sharedMem.h  $(TYPE_PATH)types.h
 	cc $(CFLAGS) -c $(UTILS_PATH)sharedMem.c
 
-utils.o: $(UTILS_PATH)utils.h $(UTILS_PATH)utils.c $(UTILS_PATH)check.h 
+utils.o: $(UTILS_PATH)utils.h $(UTILS_PATH)utils.c $(UTILS_PATH)check.h
 	cc $(CFLAGS) -c $(UTILS_PATH)utils.c
 
 check.o: $(UTILS_PATH)check.h $(UTILS_PATH)check.c
@@ -40,6 +46,8 @@ clear:
 clean:
 	rm -f $(SERVER_PATH)*.o
 	rm -f $(UTILS_PATH)*.o
+	rm -f $(CLIENT_PATH)*.o
 	rm -f serverTest
 	rm -f maint
 	rm -f gstat
+	rm -f clientTest
