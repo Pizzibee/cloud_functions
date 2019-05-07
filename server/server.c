@@ -35,6 +35,7 @@ int main(int argc, char const *argv[]) {
       checkNeg(ret,"server read error");
       printf("j'ai reçu %d\n",i );
     }
+    close(newsockfd);
   }
   sshmdt();
   return 0;
