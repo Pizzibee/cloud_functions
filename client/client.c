@@ -37,7 +37,6 @@ int main(int argc, char const *argv[]) {
 	char command = input[0];
 	switch (command) {
 		case '+':{
-			printf("Ajout du programme en cours...\n");
 			int commandToSend = -1;
 			ret = write(sockfd, &commandToSend, sizeof(int));
 			checkNeg(ret, "write client error");
@@ -78,6 +77,15 @@ int main(int argc, char const *argv[]) {
 			//TODO : changer en une bouclie while
 			printf("Message d'erreur du compilateur : %s\n", errorMessage);
 		 	break;
+		}
+		case '@':{
+			int commandToSend = -2;
+			ret = write(sockfd, &commandToSend, sizeof(int));
+			checkNeg(ret, "write client error");
+			int programNumber = atoi(&input[2]);
+			ret = write(sockfd, &programNumber, sizeof(int));
+			checkNeg(ret, "write client error");
+			break;
 		}
 	 	default:
 			printf("ya pas encore\n");

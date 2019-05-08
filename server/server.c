@@ -69,6 +69,7 @@ int main(int argc, char const *argv[]) {
 				int programId;
 				ret = read(newsockfd,&programId,sizeof(int));
 				checkNeg(ret,"server read choice error");
+				printf("%d\n", programId);
 				p = getProgram(programId);
       }
     }
