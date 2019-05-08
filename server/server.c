@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include "../types/types.h"
 #include "../utils/sharedMem.h"
 #include "../utils/utils.h"
@@ -22,7 +23,7 @@ int initSocketServer(int port)
 
 int main(int argc, char const *argv[]) {
   printf("Server hello\n");
-  int sockfd, newsockfd, i, ret;
+  int sockfd, newsockfd, ret;
 
   initShm();
   sockfd = initSocketServer(SERVER_PORT);
@@ -31,9 +32,41 @@ int main(int argc, char const *argv[]) {
     /* client trt */
     newsockfd = accept(sockfd, NULL,NULL);
     if (newsockfd > 0 ) {
-      ret = read(newsockfd,&i,sizeof(int));
-      checkNeg(ret,"server read error");
-      printf("j'ai reçu %d\n",i );
+      int req;
+			Program p;
+      ret = read(newsockfd,&req,sizeof(int));
+      checkNeg(ret,"server read choice error");
+      if (req == -1) {
+        int sizeName;
+				char fileName[256];
+				char buf[150];
+				int fd;
+        ret = read(newsockfd,&sizeName,sizeof(int));
+        checkNeg(ret,"server read file size error");
+				printf("%d\n",sizeName);
+				ret = read(newsockfd,&fileName,sizeName*sizeof(char));
+				checkNeg(ret,"server read file size error");
+				printf("%s\n",fileName);
+				fd = open(fileName, O_RDWR | O_TRUNC | O_CREAT, 0644);
+				checkNeg(fd,"file descriptor error");
+				while(read(newsockfd,&buf,150*sizeof(char)) != 0){
+					printf("%s\n",buf );
+					write(fd, buf, 150);
+				}
+				close(fd);
+				strcpy(p.sourceFile,fileName);
+				p.executionCounter = 1;
+				int id = addProgram(p);
+				ret = write(newsockfd,&id,sizeof(int));
+				checkNeg(ret,"server write id size error");
+				ret = write(newsockfd,&buf,150*sizeof(char));
+
+      } else{
+				int programId;
+				ret = read(newsockfd,&programId,sizeof(int));
+				checkNeg(ret,"server read choice error");
+				p = getProgram(programId);
+      }
     }
     close(newsockfd);
   }

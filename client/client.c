@@ -33,6 +33,7 @@ int main(int argc, char const *argv[]) {
   printf("Veuillez entrez une commande : \n");
 	ret = read(0, &input, MAX_INPUT);
 	checkNeg(ret, "read client error");
+	input[ret-1] = '\0';
 	char command = input[0];
 	switch (command) {
 		case '+':{
@@ -42,16 +43,18 @@ int main(int argc, char const *argv[]) {
 			int fileNameLength = strlen(input+2);
 			ret = write(sockfd, &fileNameLength, sizeof(int));
 			checkNeg(ret, "write client error");
-			ret = write(sockfd, &input+2, fileNameLength*sizeof(char));
+			ret = write(sockfd, input+2, fileNameLength*sizeof(char));
 			checkNeg(ret, "write client error");
-			int fd = open(input+2, O_RDONLY);
+			int fd = open(input+2, O_RDONLY | O_CREAT, 0644);
 			checkNeg(fd, "file descriptor client error");
 			char buffer[READ_SIZE];
 			int readChar;
 			while ((readChar = read(fd, &buffer, READ_SIZE*sizeof(char))) != EOF){
 				ret = write(sockfd, &buffer, readChar*sizeof(char));
 				checkNeg(ret, "write client error");
+
 			}
+			close(fd);
 			shutdown(sockfd, SHUT_WR);
 		 	break;
 		}
