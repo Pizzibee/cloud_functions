@@ -38,20 +38,24 @@ int main(int argc, char const *argv[]) {
       checkNeg(ret,"server read choice error");
       if (req == -1) {
         int sizeName;
-				char fileName[256];
+				char fileName[255];
+				char path[255] = "serverPrograms/";
 				char buf[150];
 				int fd;
+				int readChar;
         ret = read(newsockfd,&sizeName,sizeof(int));
         checkNeg(ret,"server read file size error");
 				printf("%d\n",sizeName);
 				ret = read(newsockfd,&fileName,sizeName*sizeof(char));
 				checkNeg(ret,"server read file size error");
 				printf("%s\n",fileName);
-				fd = open(fileName, O_RDWR | O_TRUNC | O_CREAT, 0644);
+				strcat(path, fileName);
+				printf("%s\n", path);
+				fd = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 				checkNeg(fd,"file descriptor error");
-				while(read(newsockfd,&buf,150*sizeof(char)) != 0){
-					printf("%s\n",buf );
-					write(fd, buf, 150);
+				while((readChar = read(newsockfd,buf,150*sizeof(char))) != 0){
+					ret = write(fd, buf, readChar*sizeof(char));
+					checkNeg(ret,"server write file error");
 				}
 				close(fd);
 				strcpy(p.sourceFile,fileName);
