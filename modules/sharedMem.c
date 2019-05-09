@@ -6,9 +6,8 @@
 #include "sharedMem.h"
 
 #define SHM_KEY 241
-#define SEM_KEY 369
+#define SEM_KEY 368
 #define PERM 0666
-#define INITIAL_SIZE 10
 
 
 //******************************************************************************
@@ -40,22 +39,33 @@ void delShm() {
 }
 
 void initArray(){
+  down();
   tab->size = 0;
+  up();
 }
 
 int getSize(){
-  return tab->size;
+  down();
+  int res = tab->size;
+  up();
+  return res;
 }
 
 int addProgram(Program p) {
+  down();
   p.id = tab->size;
   (tab->tabProg)[tab->size] = p;
   (tab->size) = tab->size + 1;
+  up();
   return p.id;
 }
 
 Program getProgram(int index){
-  return (tab->tabProg)[index];
+  down();
+  Program p = (tab->tabProg)[index];
+  up();
+  return p;
+
 }
 
 
@@ -77,6 +87,11 @@ void initSem(int val) {
 
   int rv = semctl(sem_id, 0, SETVAL, arg);
   checkNeg(rv, "Error semctl");
+}
+
+void getSem(){
+  sem_id = semget(SEM_KEY, 1, IPC_CREAT | PERM);
+  checkNeg(sem_id, "Error semget");
 }
 
 void addSem(int val) {

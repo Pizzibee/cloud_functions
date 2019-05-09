@@ -11,6 +11,7 @@ int getSize();
 int addProgram(Program p);
 Program getProgram(int index);
 void initSem(int val);
+void getSem();
 void addSem(int val);
 void down();
 void up();
