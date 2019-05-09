@@ -4,3 +4,7 @@ client/*.o
 modules/*.o
 server/*.o
 *.o
+clientTest
+gstat
+maint
+serverTest
