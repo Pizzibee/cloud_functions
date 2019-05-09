@@ -21,4 +21,9 @@ typedef struct{
   int size;
 } ProgramArray;
 
+typedef struct{
+  int type; //from son or father
+  int programNumber; 
+} Message;
+
 #endif
