@@ -10,6 +10,7 @@ int main(int argc, char const *argv[]) {
   else{
     int arg = atoi(argv[1]);
     initShm();
+    getSem();
     if(arg >= getSize()) {
       printf("Cet id n'existe pas \n");
     }
