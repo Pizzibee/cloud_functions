@@ -16,7 +16,7 @@ void checkCond(bool cond, char* msg) {
   if (cond) {
     perror(msg);
     exit(1);
-  }  
+  }
 }
 
 void checkNeg(int res, char* msg) {
@@ -27,22 +27,22 @@ void checkNeg(int res, char* msg) {
 pid_t fork_and_run(void (*handler)()) {
   int childId = fork();
   checkNeg(childId, "Error [fork_and_run]");
-  
+
   // child process
-  if (childId == 0) {  
+  if (childId == 0) {
     (*handler)();
     exit(0);
   }
-  
+
   return childId;
 }
 
 long now() {
   struct timeval  tv;
-  
+
   int res = gettimeofday(&tv, NULL);
   checkNeg(res, "Error gettimeofday");
-  
+
   return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
@@ -66,13 +66,13 @@ int main() {
   printf("**************************\n");
   int fd = open("res_compile.txt", O_CREAT | O_WRONLY| O_TRUNC, 0666);
   checkNeg(fd, "ERROR open");
-  
+
   printf("**************************\n");
   printf("REDIRECTION DE STDERR\n");
   printf("**************************\n");
   int stderr_copy = dup(2);
   checkNeg(stderr_copy, "ERROR dup");
-  
+
   int ret = dup2(fd, 2);
   checkNeg(ret, "ERROR dup2");
 
@@ -83,7 +83,7 @@ int main() {
   int status;
   wait(&status);
   printf("SI %d != 0, ALORS regarde dans res_compile.txt\n", WEXITSTATUS(status));
-  
+
   printf("**************************\n");
   printf("RÉTABLISSEMENT DE STDERR\n");
   printf("**************************\n");
