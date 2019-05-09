@@ -66,7 +66,7 @@ void exec2(void* path) {
   char pathFolder[MAX_SIZE];
   strcpy(pathFolder,pathProg);
   pathFolder[strlen(pathProg)-2] = '\0';
-  execl(pathFolder, "hello", NULL);
+  execl(pathFolder, NULL);
   perror("Error exec 2");
 }
 
