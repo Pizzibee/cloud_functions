@@ -2,24 +2,17 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#include "../utils/utils.h"
-#include "../utils/check.h"
+#include "../modules/utils.h"
+#include "../modules/check.h"
+#include "../modules/socket.h"
 
 #define DEFAULT_SIZE 255
 #define READ_SIZE 150
-struct sockaddr_in addr;
-int initSocketClient(char ServerIP[16], int Serverport){
-	// socket creation
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	// prepare socket to connect
-	memset(&addr,0,sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(Serverport);
-	inet_aton(ServerIP,&addr.sin_addr);
-	connect(sockfd, (struct sockaddr *) &addr,sizeof(addr));
-	return sockfd;
-}
-void prompt_handler(){
+
+#define SERVER_PORT 9500
+#define SERVER_IP	"127.0.0.1"  /* localhost */
+
+void recurrent_handler(){
 }
 
 void timer_handler(){

@@ -2,24 +2,14 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include "../types/types.h"
-#include "../utils/sharedMem.h"
-#include "../utils/utils.h"
-#include "../utils/check.h"
+#include "../modules/sharedMem.h"
+#include "../modules/utils.h"
+#include "../modules/check.h"
+#include "../modules/socket.h"
 
-struct sockaddr_in addr;
-/* return sockfd */
-int initSocketServer(int port)
-{
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&addr,0,sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	// listen on all server interfaces
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	bind(sockfd,(struct sockaddr*)&addr,sizeof(addr));
-	listen(sockfd,5);
-	return sockfd;
-}
+#define SERVER_PORT 9500
+#define SERVER_IP	"127.0.0.1"  /* localhost */
+
 
 int main(int argc, char const *argv[]) {
   printf("Server hello\n");
@@ -64,7 +54,6 @@ int main(int argc, char const *argv[]) {
 				ret = write(newsockfd,&id,sizeof(int));
 				checkNeg(ret,"server write id size error");
 				ret = write(newsockfd,&buf,150*sizeof(char));
-
       } else{
 				int programId;
 				ret = read(newsockfd,&programId,sizeof(int));

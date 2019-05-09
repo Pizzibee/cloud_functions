@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../utils/sharedMem.h"
+#include "../modules/sharedMem.h"
 #include "../types/types.h"
 
 int main(int argc, char const *argv[]) {
