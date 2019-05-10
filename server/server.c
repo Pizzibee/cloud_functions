@@ -177,7 +177,6 @@ void addProg(void* sock){
       }
     }
   }
-  //shutdown(newsockfd, SHUT_RDWR);
   sclose(newsockfd);
 }
 

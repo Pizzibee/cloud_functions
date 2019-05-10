@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 #include "../modules/utils.h"
 #include "../modules/check.h"
@@ -23,6 +25,8 @@ void sendAddToServer(char* input);
 void readAddFromServer(int sockfd);
 void readExecFromServer(int sockfd);
 void executeProgramRecurrent(int programNumber);
+void killChildRecurrent();
+void killChildTimer();
 
 int main(int argc, char *argv[]) {
   if (argc != 4){
@@ -32,15 +36,18 @@ int main(int argc, char *argv[]) {
   //variable initialization
 	char input[DEFAULT_SIZE];
 	int ret;
+  int delay;
+  int recurrentChildPid;
+  int timerChildPid;
   //argument extraction
   adr = argv[1];
   port = atoi(argv[2]);
-  int delay = atoi(argv[3]);
+  delay = atoi(argv[3]);
   //pipe creation
   spipe(pipefd);
   //childs execution
-  fork_and_run(&recurrentChild);
-  fork_and_run1(&timerChild, &delay);
+  recurrentChildPid = fork_and_run(&recurrentChild);
+  timerChildPid = fork_and_run1(&timerChild, &delay);
   //pipe configuration
   sclose(pipefd[0]);
 	while(true){
@@ -69,8 +76,10 @@ int main(int argc, char *argv[]) {
         break;
       }
       case 'q':{
-        exit(1);
-        close(pipefd[1]);
+        sclose(pipefd[1]);
+        kill(recurrentChildPid, SIGQUIT);
+        kill(timerChildPid, SIGQUIT);
+        exit(0);
         //kill childrens
       }
 	  }
@@ -80,11 +89,10 @@ int main(int argc, char *argv[]) {
 
 
 void recurrentChild(){
+  signal(SIGQUIT, killChildRecurrent);
   int tab[MAX_PARA_PROGRAM];
   int logicalSize = 0;
-  int ret;
-  ret = close(pipefd[1]);
-  checkNeg(ret, "close pipe client error recurrent function");
+  sclose(pipefd[1]);
   while (true) {
     Message messageReceived;
     //read pipe
@@ -100,22 +108,29 @@ void recurrentChild(){
       }
     }
   }
-  close(pipefd[0]);
+}
+
+void killChildRecurrent(){
+  sclose(pipefd[0]);
+  exit(0);
+}
+
+void killChildTimer(){
+  sclose(pipefd[1]);
+  exit(0);
 }
 
 void timerChild(void* delay){
+  signal(SIGQUIT, killChildTimer);
   int* delayPtr = delay;
   int delayInt = *delayPtr;
-  int ret;
-  ret = close(pipefd[0]);
-  checkNeg(ret, "close pipe client error timer");
+  sclose(pipefd[0]);
   while (true) {
     sleep(delayInt);
     Message message;
     message.type = 2;
     write(pipefd[1], &message, sizeof(Message));
   }
-  close(pipefd[1]);
 }
 
 int extractFileNameIndex(char* input, int fileNameLength){
@@ -151,7 +166,7 @@ void sendAddToServer(char* input){
   sclose(fd);
   shutdown(sockfd, SHUT_WR);
   readAddFromServer(sockfd);
-  close(sockfd);
+  sclose(sockfd);
   printf("--------------------------------------------\n\n");
 }
 void readAddFromServer(int sockfd){
@@ -176,7 +191,7 @@ void sendExecToServer(int programNumber){
   //read response from server
   readExecFromServer(sockfd);
   printf("--------------------------------------------\n\n");
-  close(sockfd);
+  sclose(sockfd);
 }
 
 void readExecFromServer(int sockfd){
