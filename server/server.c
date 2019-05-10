@@ -110,7 +110,7 @@ void addProg(void* sock){
 
     if (WIFEXITED(status) && !WEXITSTATUS(status)) {
       p.compilationError = false;
-      char compilRes[MAX_SIZE];
+      char compilRes[MAX_BUF];
       strcpy(compilRes,"compilation ok");
       ret = write(newsockfd,&compilRes,strlen(compilRes)*sizeof(char));
       checkNeg(ret,"server write id size error");
@@ -188,6 +188,7 @@ void addProg(void* sock){
             ret = write(newsockfd, &buffer, readChar*sizeof(char));
             checkNeg(ret, "write client error");
           }
+          close(fd);
         }
         else{
           int req = 0;
@@ -203,6 +204,8 @@ void addProg(void* sock){
       }
     }
   }
+  printf("BOnjour sushil\n" );
+  //shutdown(newsockfd, SHUT_RDWR);
   close(newsockfd);
 }
 
@@ -219,6 +222,7 @@ int main(int argc, char const *argv[]) {
     newsockfd = accept(sockfd, NULL,NULL);
     if (newsockfd > 0 ) {
       fork_and_run1(&addProg, &newsockfd);
+      close(newsockfd);
     }
   }
   sshmdt();

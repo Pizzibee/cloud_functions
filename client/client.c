@@ -16,6 +16,7 @@ char *adr;
 int port;
 
 void sendExecToServer(int programNumber){
+  printf("sendExecToServer program number %d\n", programNumber);
   int sockfd = initSocketClient(adr, port);
   int commandToSend = -2;
   int ret;
@@ -31,7 +32,6 @@ void sendExecToServer(int programNumber){
   printf("Id du programme executé : %d\n", programNumberReceived);
   ret = read(sockfd, &programState, sizeof(int));
   checkNeg(ret, "read client error");
-  printf("etat prog : %d\n", programState);
   switch (programState) {
     case -2:{
       printf("Le programme %d n'existe pas\n", programNumberReceived);
@@ -57,14 +57,11 @@ void sendExecToServer(int programNumber){
       printf("Le code de retour du programme : %d\n", returnCode);
       char buffer[READ_SIZE];
       int readChar;
-      printf("Afficha à la sortie standard du programme %d :\n", programNumberReceived);
+      printf("Affichage à la sortie standard du programme n° %d :\n", programNumberReceived);
       while  ((readChar = read(sockfd, buffer, READ_SIZE*sizeof(char))) != 0 ){
         printf("%s\n", buffer);
       }
-      break;
-    }
-    default:{
-      printf("etat du prog reçu %d\n", programState);
+      printf("eee\n");
       break;
     }
   }
@@ -81,10 +78,8 @@ void recurrent_handler(void* pipe0, void* pipe1){
     Message messageReceived;
     //read pipe
     read(pipefd[0], &messageReceived, sizeof(Message));
-    printf("Type received : %d\n", messageReceived.type);
     if (messageReceived.type == 1){
       //if from pere then add to tab
-      printf("ProgramNumber received %d\n", messageReceived.programNumber);
       tab[logicalSize] = messageReceived.programNumber;
       logicalSize++;
     }else{
@@ -181,9 +176,10 @@ int main(int argc, char *argv[]) {
   			int readChar2;
   			ret = read(sockfd, &programNumber, sizeof(int));
   			checkNeg(ret, "read client error");
-  			printf("Id du programme ajouté : %d\n", programNumber);
+  			printf("ID du programme ajouté : %d\n", programNumber);
   			printf("Message d'erreur du compilateur :\n");
-  			while  ((readChar2 = read(sockfd, buffer2, READ_SIZE*sizeof(char))) != 0 ){
+  			while  ((readChar2 = read(sockfd, buffer2, READ_SIZE*sizeof(char))) != 0){
+          printf("readchar2 %d\n", readChar2);
   				printf("%s\n", buffer2);
   			}
       	close(sockfd);
@@ -196,7 +192,7 @@ int main(int argc, char *argv[]) {
   			break;
   		}
       case '*':{
-        // send program number to recurrent child in struct Message with type 1 (pipe)
+        // send program number to recurrent child
         int programNumber = atoi(&input[2]);
         Message message;
         message.type = 1;
@@ -206,9 +202,9 @@ int main(int argc, char *argv[]) {
       }
       case 'q':{
         exit(1);
-        //quit server and free ressources
+        close(pipefd[1]);
+        //kill childrens
       }
 	  }
   }
-  close(pipefd[1]);
 }
