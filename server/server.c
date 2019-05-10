@@ -43,7 +43,7 @@ int compileC(Program p){
 }
 
 long now() {
-  struct timeval  tv;
+  struct timeval tv;
 
   int res = gettimeofday(&tv, NULL);
   checkNeg(res, "Error gettimeofday");
@@ -84,11 +84,8 @@ void addProg(void* sock){
     int fd;
     int readChar;
     sread(newsockfd,&sizeName,sizeof(int));
-    printf("%d\n",sizeName);
     sread(newsockfd,&fileName,sizeName*sizeof(char));
-    printf("%s\n",fileName);
     strcat(path, fileName);
-    printf("%s\n", path);
     fd = sopen(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
     while((readChar = sread(newsockfd,buf,MAX_BUF*sizeof(char))) != 0){
       swrite(fd, buf, readChar*sizeof(char));
@@ -113,7 +110,6 @@ void addProg(void* sock){
       strcat(path, "_res_compile.txt");
       int fdErr = sopen(path, O_RDONLY | O_CREAT, 0666);
       while((readChar = sread(fdErr,bufErr,MAX_BUF*sizeof(char))) != 0){
-        printf("%s\n",bufErr );
         swrite(newsockfd, bufErr, readChar*sizeof(char));
       }
       sclose(fdErr);
@@ -124,7 +120,6 @@ void addProg(void* sock){
   } else{
     int programId;
     sread(newsockfd,&programId,sizeof(int));
-    printf("%d\n", programId);
     swrite(newsockfd,&programId,sizeof(int));
     if(programId >= getSize()){
       int req = -2;
@@ -166,7 +161,6 @@ void addProg(void* sock){
           char buffer[MAX_SIZE];
           int readChar;
           while  ((readChar = sread(fd, buffer, MAX_SIZE*sizeof(char))) != 0 ){
-            printf("%s\n", buffer);
             swrite(newsockfd, &buffer, readChar*sizeof(char));
           }
           sclose(fd);
@@ -183,7 +177,6 @@ void addProg(void* sock){
       }
     }
   }
-  printf("BOnjour sushil\n" );
   //shutdown(newsockfd, SHUT_RDWR);
   sclose(newsockfd);
 }
@@ -191,7 +184,6 @@ void addProg(void* sock){
 
 
 int main(int argc, char const *argv[]) {
-  printf("Server hello\n");
   int sockfd, newsockfd;
   getSem();
   initShm();
