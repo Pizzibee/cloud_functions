@@ -27,8 +27,7 @@ int compileC(Program p){
   strcpy(pathCompile,p.sourceFile);
   pathCompile[strlen(pathCompile)-2] = '\0';
   strcat(pathCompile, "_res_compile.txt");
-  int fdCompile = open(pathCompile, O_CREAT | O_WRONLY| O_TRUNC, 0666);
-  checkNeg(fdCompile, "ERROR open");
+  int fdCompile = sopen(pathCompile, O_CREAT | O_WRONLY| O_TRUNC, 0666);
   int stderr_copy = dup(2);
   checkNeg(stderr_copy, "ERROR dup");
   ret = dup2(fdCompile, 2);
@@ -38,8 +37,8 @@ int compileC(Program p){
   wait(&status);
   ret = dup2(stderr_copy, 2);
   checkNeg(ret, "ERROR dup");
-  close(stderr_copy);
-  close(fdCompile);
+  sclose(stderr_copy);
+  sclose(fdCompile);
   return status;
 }
 
@@ -76,8 +75,7 @@ void addProg(void* sock){
   int newsockfd = *sockInt;
   int req, ret;
   Program p;
-  ret = read(newsockfd,&req,sizeof(int));
-  checkNeg(ret,"server read choice error");
+  sread(newsockfd,&req,sizeof(int));
   if (req == -1) {
     int sizeName;
     char fileName[MAX_SIZE];
@@ -85,63 +83,52 @@ void addProg(void* sock){
     char buf[MAX_BUF];
     int fd;
     int readChar;
-    ret = read(newsockfd,&sizeName,sizeof(int));
-    checkNeg(ret,"server read file size error");
+    sread(newsockfd,&sizeName,sizeof(int));
     printf("%d\n",sizeName);
-    ret = read(newsockfd,&fileName,sizeName*sizeof(char));
-    checkNeg(ret,"server read file size error");
+    sread(newsockfd,&fileName,sizeName*sizeof(char));
     printf("%s\n",fileName);
     strcat(path, fileName);
     printf("%s\n", path);
-    fd = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
-    checkNeg(fd,"file descriptor error");
-    while((readChar = read(newsockfd,buf,MAX_BUF*sizeof(char))) != 0){
-      ret = write(fd, buf, readChar*sizeof(char));
-      checkNeg(ret,"server write file error");
+    fd = sopen(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
+    while((readChar = sread(newsockfd,buf,MAX_BUF*sizeof(char))) != 0){
+      swrite(fd, buf, readChar*sizeof(char));
     }
-    close(fd);
+    sclose(fd);
     strcpy(p.sourceFile,path);
     p.executionCounter = 0;
     p.executionTime = 0;
     int id = addProgram(p);
-    ret = write(newsockfd,&id,sizeof(int));
-    checkNeg(ret,"server write id size error");
+    swrite(newsockfd,&id,sizeof(int));
     int status = compileC(p);
 
     if (WIFEXITED(status) && !WEXITSTATUS(status)) {
       p.compilationError = false;
       char compilRes[MAX_BUF];
       strcpy(compilRes,"compilation ok");
-      ret = write(newsockfd,&compilRes,strlen(compilRes)*sizeof(char));
-      checkNeg(ret,"server write id size error");
+      swrite(newsockfd,&compilRes,strlen(compilRes)*sizeof(char));
     } else {
       p.compilationError = true;
       char bufErr[MAX_BUF];
       path[strlen(path)-2] = '\0';
       strcat(path, "_res_compile.txt");
-      int fdErr = open(path, O_RDONLY | O_CREAT, 0666);
-      checkNeg(fdErr,"file descriptor error");
-      while((readChar = read(fdErr,bufErr,MAX_BUF*sizeof(char))) != 0){
+      int fdErr = sopen(path, O_RDONLY | O_CREAT, 0666);
+      while((readChar = sread(fdErr,bufErr,MAX_BUF*sizeof(char))) != 0){
         printf("%s\n",bufErr );
-        ret = write(newsockfd, bufErr, readChar*sizeof(char));
-        checkNeg(ret,"server write file error");
+        swrite(newsockfd, bufErr, readChar*sizeof(char));
       }
-      close(fdErr);
+      sclose(fdErr);
     }
 
 
     // EXECUTE A PROGRAM
   } else{
     int programId;
-    ret = read(newsockfd,&programId,sizeof(int));
-    checkNeg(ret,"server read choice error");
+    sread(newsockfd,&programId,sizeof(int));
     printf("%d\n", programId);
-    ret = write(newsockfd,&programId,sizeof(int));
-    checkNeg(ret,"server write id size error");
+    swrite(newsockfd,&programId,sizeof(int));
     if(programId >= getSize()){
       int req = -2;
-      ret = write(newsockfd,&req,sizeof(int));
-      checkNeg(ret,"server write id size error");
+      swrite(newsockfd,&req,sizeof(int));
     }
     else{
       p = getProgram(programId);
@@ -153,8 +140,7 @@ void addProg(void* sock){
         strcpy(pathRes,p.sourceFile);
         pathRes[strlen(pathRes)-2] = '\0';
         strcat(pathRes, "_res_execution.txt");
-        int fdExec = open(pathRes, O_CREAT | O_WRONLY| O_TRUNC, 0666);
-        checkNeg(fdExec, "ERROR open");
+        int fdExec = sopen(pathRes, O_CREAT | O_WRONLY| O_TRUNC, 0666);
         int stdout = dup(1);
         checkNeg(stdout, "ERROR dup");
         ret = dup2(fdExec, 1);
@@ -164,8 +150,8 @@ void addProg(void* sock){
         wait(&status);
         ret = dup2(stdout, 1);
         checkNeg(ret, "ERROR dup");
-        close(stdout);
-        close(fdExec);
+        sclose(stdout);
+        sclose(fdExec);
         long t2 = now();
         long execTime = t2 - t1;
         p.executionCounter += 1;
@@ -173,40 +159,33 @@ void addProg(void* sock){
         int progStatus = WEXITSTATUS(status);
         if(WIFEXITED(status) != 0){
           int req = 1;
-          ret = write(newsockfd,&req,sizeof(int));
-          checkNeg(ret,"server write id size error");
-          ret = write(newsockfd,&execTime,sizeof(long));
-          checkNeg(ret,"server write id size error");
-          ret = write(newsockfd,&progStatus,sizeof(int));
-          checkNeg(ret,"server write id size error");
-          int fd = open(pathRes, O_RDONLY | O_CREAT, 0666);
-          checkNeg(fd, "file descriptor client error");
+          swrite(newsockfd,&req,sizeof(int));
+          swrite(newsockfd,&execTime,sizeof(long));
+          swrite(newsockfd,&progStatus,sizeof(int));
+          int fd = sopen(pathRes, O_RDONLY | O_CREAT, 0666);
           char buffer[MAX_SIZE];
           int readChar;
-          while  ((readChar = read(fd, buffer, MAX_SIZE*sizeof(char))) != 0 ){
+          while  ((readChar = sread(fd, buffer, MAX_SIZE*sizeof(char))) != 0 ){
             printf("%s\n", buffer);
-            ret = write(newsockfd, &buffer, readChar*sizeof(char));
-            checkNeg(ret, "write client error");
+            swrite(newsockfd, &buffer, readChar*sizeof(char));
           }
-          close(fd);
+          sclose(fd);
         }
         else{
           int req = 0;
-          ret = write(newsockfd,&req,sizeof(int));
-          checkNeg(ret,"server write id size error");
+          swrite(newsockfd,&req,sizeof(int));
         }
       }
       else{
         p.compilationError = true;
         int req = -1;
-        ret = write(newsockfd,&req,sizeof(int));
-        checkNeg(ret,"server write id size error");
+        swrite(newsockfd,&req,sizeof(int));
       }
     }
   }
   printf("BOnjour sushil\n" );
   //shutdown(newsockfd, SHUT_RDWR);
-  close(newsockfd);
+  sclose(newsockfd);
 }
 
 
@@ -222,7 +201,7 @@ int main(int argc, char const *argv[]) {
     newsockfd = accept(sockfd, NULL,NULL);
     if (newsockfd > 0 ) {
       fork_and_run1(&addProg, &newsockfd);
-      close(newsockfd);
+      sclose(newsockfd);
     }
   }
   sshmdt();
