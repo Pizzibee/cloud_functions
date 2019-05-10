@@ -13,7 +13,7 @@ typedef struct{
   char sourceFile[FILE_SIZE];
   bool compilationError;
   int executionCounter;
-  int executionTime;
+  long executionTime;
 } Program;
 
 typedef struct{
@@ -23,7 +23,7 @@ typedef struct{
 
 typedef struct{
   int type; //from son or father
-  int programNumber; 
+  int programNumber;
 } Message;
 
 #endif

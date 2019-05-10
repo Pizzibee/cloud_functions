@@ -148,6 +148,7 @@ void addProg(void* sock){
       int status = compileC(p);
 
       if (WIFEXITED(status) && !WEXITSTATUS(status)) {
+        p.compilationError = false;
         char pathRes[MAX_SIZE];
         strcpy(pathRes,p.sourceFile);
         pathRes[strlen(pathRes)-2] = '\0';
@@ -167,6 +168,8 @@ void addProg(void* sock){
         close(fdExec);
         long t2 = now();
         long execTime = t2 - t1;
+        p.executionCounter += 1;
+        p.executionTime += execTime;
         int progStatus = WEXITSTATUS(status);
         if(WIFEXITED(status) != 0){
           int req = 1;
@@ -193,6 +196,7 @@ void addProg(void* sock){
         }
       }
       else{
+        p.compilationError = true;
         int req = -1;
         ret = write(newsockfd,&req,sizeof(int));
         checkNeg(ret,"server write id size error");

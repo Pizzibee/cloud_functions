@@ -21,7 +21,7 @@ int main(int argc, char const *argv[]) {
       if (!p.compilationError) {
         printf("1\n");
         printf("%d\n",p.executionCounter);
-        printf("%d\n",p.executionTime);
+        printf("%ld\n",p.executionTime);
       }
       else{
         printf("0\n");
