@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <time.h>
 #include <sys/time.h>
+#include <errno.h>
 #include "../types/types.h"
 #include "../modules/sharedMem.h"
 #include "../modules/utils.h"
@@ -19,6 +20,7 @@ long now();
 void progHandler(void*);
 void exec1(void* path);
 void exec2(void* path);
+void onSigint();
 
 
 int compileC(Program p){
@@ -185,17 +187,24 @@ void progHandler(void* sock){
   sclose(newsockfd);
 }
 
-
+void onSigint(){
+  while (wait(NULL) != -1 || errno != ECHILD) {
+      // nothing
+  }
+  exit(0);
+}
 
 int main(int argc, char const *argv[]) {
   int sockfd, newsockfd;
   getSem();
   initShm();
+  ssigaction(SIGINT, onSigint);
   sockfd = initSocketServer(SERVER_PORT);
   printf("Le serveur tourne sur le port : %i \n",SERVER_PORT);
   while (1) {
     newsockfd = accept(sockfd, NULL,NULL);
     if (newsockfd > 0 ) {
+      printf("ok\n" );
       fork_and_run1(&progHandler, &newsockfd);
       sclose(newsockfd);
     }

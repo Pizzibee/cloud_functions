@@ -11,24 +11,16 @@ int main(int argc, char *argv[]) {
     initShm();
     getSem();
     if (arg == 1) {
+      delShm();
+      delSem();
       initSem(1);
       initArray();
-      Program p1;
-      strcpy(p1.sourceFile,"test1.c");
-      p1.compilationError = false;
-      p1.executionCounter = 4;
-      p1.executionTime = 20;
-      Program p2;
-      strcpy(p2.sourceFile,"test2.c");
-      p2.compilationError = true;
-      p2.executionCounter = 4;
-      p2.executionTime = 20;
-      printf("%d\n", addProgram(p1));
-      printf("%d\n", addProgram(p2));
+      printf("La mémoire partagée a été créée\n");
     }
     else if(arg == 2){
       delShm();
       delSem();
+      printf("La mémoire partagée a été détruite \n");
     }
     sshmdt();
   }
@@ -39,7 +31,9 @@ int main(int argc, char *argv[]) {
       initShm();
       getSem();
       if(arg1 == 3){
+        printf("La mémoire partagée est réservée pendant %d secondes\n", arg2);
         semBlock(arg2);
+        printf("DONE.\n");
       }
       sshmdt();
     }

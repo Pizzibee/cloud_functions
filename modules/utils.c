@@ -10,7 +10,6 @@
 #include <sys/wait.h>
 
 #include <signal.h>
-
 #include "utils.h"
 #include "check.h"
 

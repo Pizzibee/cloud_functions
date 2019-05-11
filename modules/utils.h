@@ -1,12 +1,10 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
-#include <stdbool.h>
-#include <sys/types.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 
 #define BUFFER_SIZE 1024
 
