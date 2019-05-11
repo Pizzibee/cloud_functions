@@ -33,7 +33,16 @@ int main(int argc, char *argv[]) {
     sshmdt();
   }
   else{
-    printf("Un seul et unique argument est accepté !\n");
+    if (argc == 3) {
+      int arg1 = atoi(argv[1]);
+      int arg2 = atoi(argv[2]);
+      initShm();
+      getSem();
+      if(arg1 == 3){
+        semBlock(arg2);
+      }
+      sshmdt();
+    }
   }
 
   return 0;

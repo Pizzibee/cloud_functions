@@ -16,7 +16,7 @@
 
 int compileC(Program p);
 long now();
-void addProg(void*);
+void progHandler(void*);
 void exec1(void* path);
 void exec2(void* path);
 
@@ -70,7 +70,7 @@ void exec2(void* path) {
 }
 
 
-void addProg(void* sock){
+void progHandler(void* sock){
   int* sockInt = sock;
   int newsockfd = *sockInt;
   int req, ret;
@@ -78,13 +78,20 @@ void addProg(void* sock){
   sread(newsockfd,&req,sizeof(int));
   if (req == -1) {
     int sizeName;
-    char fileName[MAX_SIZE];
+    char fileName[MAX_SIZE], idStr[MAX_SIZE];
     char path[MAX_SIZE] = "serverPrograms/";
     char buf[MAX_BUF];
     int fd;
     int readChar;
+    p.executionCounter = 0;
+    p.executionTime = 0;
+    int id = addProgram(p);
+    p.id = id;
     sread(newsockfd,&sizeName,sizeof(int));
     sread(newsockfd,&fileName,sizeName*sizeof(char));
+    sprintf(idStr, "%d", id);
+    strcat(path,idStr);
+    strcat(path,"_");
     strcat(path, fileName);
     fd = sopen(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
     while((readChar = sread(newsockfd,buf,MAX_BUF*sizeof(char))) != 0){
@@ -92,9 +99,6 @@ void addProg(void* sock){
     }
     sclose(fd);
     strcpy(p.sourceFile,path);
-    p.executionCounter = 0;
-    p.executionTime = 0;
-    int id = addProgram(p);
     swrite(newsockfd,&id,sizeof(int));
     int status = compileC(p);
 
@@ -114,7 +118,7 @@ void addProg(void* sock){
       }
       sclose(fdErr);
     }
-
+    setProgram(id, p);
 
     // EXECUTE A PROGRAM
   } else{
@@ -175,6 +179,7 @@ void addProg(void* sock){
         int req = -1;
         swrite(newsockfd,&req,sizeof(int));
       }
+      setProgram(programId, p);
     }
   }
   sclose(newsockfd);
@@ -191,7 +196,7 @@ int main(int argc, char const *argv[]) {
   while (1) {
     newsockfd = accept(sockfd, NULL,NULL);
     if (newsockfd > 0 ) {
-      fork_and_run1(&addProg, &newsockfd);
+      fork_and_run1(&progHandler, &newsockfd);
       sclose(newsockfd);
     }
   }

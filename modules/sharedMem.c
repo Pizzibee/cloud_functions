@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "check.h"
 #include "../types/types.h"
 #include "sharedMem.h"
@@ -68,6 +65,12 @@ Program getProgram(int index){
 
 }
 
+void setProgram(int id, Program p){
+  down();
+  (tab->tabProg)[id] = p;
+  up();
+}
+
 
 //******************************************************************************
 //SEMAPHORE
@@ -115,4 +118,10 @@ void up() {
 void delSem() {
   int rv = semctl(sem_id, 0, IPC_RMID);
   checkNeg(rv, "Error semctl");
+}
+
+void semBlock(int t){
+  down();
+  sleep(t);
+  up();
 }
