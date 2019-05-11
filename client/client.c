@@ -209,7 +209,7 @@ void readExecFromServer(int sockfd){
       printf("Le programme n°%d ne compile pas.\n", programNumberReceived);
       break;
     }
-    case -0:{
+    case 0:{
       printf("Le programme n°%d ne s'est pas terminé normalement.\n", programNumberReceived);
       break;
     }
