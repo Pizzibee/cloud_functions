@@ -73,6 +73,7 @@ void exec2(void* path) {
 
 
 void progHandler(void* sock){
+  signal(SIGINT, SIG_IGN);
   int* sockInt = sock;
   int newsockfd = *sockInt;
   int req, ret;
@@ -187,24 +188,33 @@ void progHandler(void* sock){
   sclose(newsockfd);
 }
 
-void onSigint(){
-  while (wait(NULL) != -1 || errno != ECHILD) {
-      // nothing
+void onSigintParent(){
+  while (true) {
+      int stats;
+      pid_t done = wait(&stats);
+      if (done == -1) {
+          if (errno == ECHILD) break; // no more child processes
+      } else {
+          if (!WIFEXITED(stats) || WEXITSTATUS(stats) != 0) {
+              printf("pid %d\n",done );
+              exit(1);
+          }
+      }
   }
   exit(0);
 }
+
 
 int main(int argc, char const *argv[]) {
   int sockfd, newsockfd;
   getSem();
   initShm();
-  ssigaction(SIGINT, onSigint);
   sockfd = initSocketServer(SERVER_PORT);
+  ssigaction(SIGINT, &onSigintParent);
   printf("Le serveur tourne sur le port : %i \n",SERVER_PORT);
   while (1) {
     newsockfd = accept(sockfd, NULL,NULL);
     if (newsockfd > 0 ) {
-      printf("ok\n" );
       fork_and_run1(&progHandler, &newsockfd);
       sclose(newsockfd);
     }
